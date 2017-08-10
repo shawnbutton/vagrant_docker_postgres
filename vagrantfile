@@ -39,15 +39,29 @@ puts "Configuring proxy..."
   end
 
 
-# config.vm.provision "shell", inline: <<-SHELL
-# sudo yum -y install epel-release
-# sudo yum -y install qt5-qtbase
-# sudo yum -y install qt5-qtbase-devel
-# sudo yum -y install jbigkit.x86_64
-# sudo yum -y install gcc-c++
-    # sudo yum -y install git
-    # sudo yum groupinstall basic-desktop desktop-platform x11 fonts
-  # SHELL
+config.vm.provision "shell", inline: <<-SHELL
+
+  # install docker repository
+  echo "*** configuring docker repo"
+  # libraries
+  sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+    # configure repo
+  sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+  # yum package index
+  echo "*** yum package index"
+  sudo yum makecache fast
+
+  # docker
+  echo "*** install docker"
+  sudo yum install -y docker-ce
+  echo "*** start docker"
+  sudo systemctl start docker
+  echo "*** add vagrant user to docker group"
+  sudo usermod -a -G docker vagrant
+
+
+SHELL
 
   # config.vm.provision :shell, :inline => "echo \"vagrant\"|passwd --stdin vagrant"
   # config.vm.provision :shell, :inline => "echo \"vagrant\"|passwd --stdin root"
